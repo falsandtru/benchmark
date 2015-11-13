@@ -11,13 +11,13 @@ Description.
 function benchmark(Benchmark) {
   var arr = [0];
   return new Benchmark.Suite()
-    .add('Array exist index access', function () {
+    .add('arr[0]: exist number', function () {
       arr[0];
     })
-    .add('Array outrange positive index access', function () {
+    .add('arr[1]: outrange positive number', function () {
       arr[1];
     })
-    .add('Array outrange negative index access', function () {
+    .add('arr[-1]: outrange negative number', function () {
       arr[-1];
     });
 }

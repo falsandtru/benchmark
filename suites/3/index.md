@@ -11,13 +11,13 @@ Array copy.
 function benchmark(Benchmark) {
   var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   return new Benchmark.Suite()
-    .add('slice', function () {
+    .add('Array#slice', function () {
       arr.slice();
     })
-    .add('concat', function () {
+    .add('Array#concat', function () {
       arr.concat();
     })
-    .add('manipulate', function () {
+    .add('for loop', function () {
       var arr2 = [];
       for (var i = 0; i < arr.length; i++) {
         arr2[i] = arr[i];

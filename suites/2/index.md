@@ -11,16 +11,16 @@ Some access method for object member has large overhead.
 function benchmark(Benchmark) {
   var obj = {};
   return new Benchmark.Suite()
-    .add('dot', function () {
+    .add('obj.p', function () {
       obj.p;
     })
-    .add('literal', function () {
+    .add('obj["p"]', function () {
       obj['p'];
     })
-    .add('hasOwnProperty', function () {
+    .add('obj.hasOwnProperty("p")', function () {
       obj.hasOwnProperty('p');
     })
-    .add('`in` operator', function () {
+    .add('"p" in obj', function () {
       'p' in obj;
     });
 }

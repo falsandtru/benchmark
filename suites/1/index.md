@@ -11,13 +11,13 @@ Array negative number index access has large overhead.
 function benchmark(Benchmark) {
   var arr = [0];
   return new Benchmark.Suite()
-    .add('exist number', function () {
+    .add('arr[0]: exist number', function () {
       arr[0];
     })
-    .add('outrange positive number', function () {
+    .add('arr[1]: outrange positive number', function () {
       arr[1];
     })
-    .add('outrange negative number', function () {
+    .add('arr[-1]: outrange negative number', function () {
       arr[-1];
     });
 }
