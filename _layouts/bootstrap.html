@@ -130,13 +130,15 @@ pre .line-numbers {
             .append($('<p/>').text(String(event.target).slice(event.target.name.length)));
         })
         .on('complete', function () {
-          var fastest = this.filter('fastest');
           var results = [].concat.apply([], this);
+          var fastest = results.sort(function (a, b) {
+            return b.hz - a.hz;
+          })[0];
           $('#benchmark-result div:first h4')
             .each(function (_, elem) {
               var name = $(elem).text();
               switch (name) {
-                case fastest.pluck('name').slice(-1).pop():
+                case fastest.name:
                   $(elem)
                     .css({
                       'font-weight': 'bold'
@@ -145,7 +147,7 @@ pre .line-numbers {
                     .replaceWith(elem.outerHTML.replace(/<h4/i, '<h3'));
                   break;
                 default:
-                  var per = parseInt(results.filter(function (r) { return r.name === name; })[0].hz / fastest[0].hz * 1000) / 10;
+                  var per = parseInt(results.filter(function (r) { return r.name === name; })[0].hz / fastest.hz * 1000) / 10;
                   if (per > 50) break;
                   $(elem)
                     .css({
