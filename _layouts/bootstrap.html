@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noarchive">
+<link rel="canonical" href="https://falsandtru.github.io/benchmark/">
+
+{% if page.type == "index" %}
+<title>{{ site.title }}</title>
+{% else %}
+<title>{{ page.title }} | {{ site.title }}</title>
+{% endif %}
+
+<!-- Bootstrap -->
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<link href="/benchmark/assets/css/style.css" rel="stylesheet">
+<link href='//fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
+<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/start/jquery-ui.min.css" rel="stylesheet">
+<link href="/sitemap.xml" rel="sitemap" type="application/xml" title="Sitemap">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<style>
+h1 {
+  margin-bottom: 1em;
+}
+pre {
+  background-color: #F9F9F9;
+}
+pre:focus {
+  background-color: transparent;
+}
+pre .line-numbers {
+  display: none;
+}
+</style>
+</head>
+<body>
+<noscript><p class="browsehappy warning">Please enable <strong>JavaScript</strong></p></noscript>
+<!--[if lte IE 9]>
+<p class="alert alert-warning" role="alert">You are using an <strong>outdated</strong> browser. Please <a class="alert-link" href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<div id="container" class="container {{ page.class }}">
+<!-- ----- HEADER ------------------------------------------------------------- -->
+<header id="header" class="row">
+<h1><a href="/">{{ site.title }}</a></h1>
+</header>
+
+<div id="wrapper" class="row">
+<!-- ----- PRIMARY ------------------------------------------------------------ -->
+<div id="primary" class="col-md-10 col-md-push-2">
+<article id="content">
+
+{{ content }}
+
+<div style="text-align: center; margin-top: 5em; margin-bottom: 2em;">
+<button class="benchmark-run btn btn-primary btn-lg" style="width: 90%; height: 3em;">Bench</button>
+</div>
+
+<div id="benchmark-result" style="border: solid 1px lightgray; min-height: 100px; padding: 0 3% 1% 3%;"></div>
+
+</article>
+<aside></aside>
+</div>
+
+<!-- ----- SECONDARY ---------------------------------------------------------- -->
+<div id="secondary" class="col-md-2 col-md-pull-10">
+{% include nav.html %}
+</div>
+
+<!-- ----- TERTIARY ----------------------------------------------------------- -->
+<div id="tertiary">
+<aside></aside>
+</div>
+
+</div>
+
+<!-- ----- FOOTER ------------------------------------------------------------- -->
+<footer id="footer">
+
+</footer>
+
+</div>
+
+<div class="loading" style="background:rgba(0,0,0,.2);display:none;position:fixed;bottom:0;left:0;z-index:9999;width:100%;height:5px;">
+  <div style="background:#f77;position:absolute;top:0;left:0;width:0;height:3px;"></div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery-ui-i18n.min.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/benchmark/assets/js/benchmark.js"></script>
+
+<script>
+  $('.benchmark-run')
+    .on('click', function () {
+      var code = $(this)
+        .parent()
+        .prev()
+        .find('pre')
+        .text();
+      try {
+        eval(code);
+        Benchmark;
+      }
+      catch (err) {
+        alert('Benchmark suite loading is faild: ' + err);
+      }
+      $('.benchmark-run').prop('disabled', true);
+      $('#benchmark-result')
+        .prepend('<div style="border-bottom: solid 1px lightgray; padding: 0 2%;"/>');
+      benchmark(Benchmark)
+        .on('cycle', function (event) {
+          $('#benchmark-result div:first')
+            .append($('<h4/>').text(event.target.name))
+            .append($('<p/>').text(String(event.target).slice(event.target.name.length)));
+        })
+        .on('complete', function () {
+          var fastest = this.filter('fastest');
+          var results = [].concat.apply([], this);
+          $('#benchmark-result div:first h4')
+            .each(function (_, elem) {
+              var name = $(elem).text();
+              switch (name) {
+                case fastest.pluck('name').slice(-1).pop():
+                  $(elem)
+                    .css({
+                      'font-weight': 'bold'
+                    })
+                    .prepend('[Fastest]<br>')
+                    .replaceWith(elem.outerHTML.replace(/<h4/i, '<h3'));
+                  break;
+                default:
+                  var per = parseInt(results.filter(function (r) { return r.name === name; })[0].hz / fastest[0].hz * 1000) / 10;
+                  if (per > 50) break;
+                  $(elem)
+                    .css({
+                      'font-weight': 'bold',
+                      color: 'red'
+                    })
+                    .prepend('[BAD ' + per + '%]<br>')
+                    .replaceWith(elem.outerHTML.replace(/<h4/i, '<h3'));
+                  break;
+              }
+            });
+            $('.benchmark-run').prop('disabled', false);
+        })
+        .run({ 'async': true });
+    });
+  $('pre').attr('contenteditable', true);
+  $('pre .line-numbers').remove();
+</script>
+
+<script>
+if (!window.ga) {
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-43533651-1', 'auto');
+  ga('require', 'linkid', 'linkid.js');
+  ga('require', 'displayfeatures');
+}
+ga('send', 'pageview', window.location.pathname.replace(/^\/?/, '/') + window.location.search);
+</script>
+
+</body>
+</html>
