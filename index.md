@@ -6,7 +6,7 @@ type: index
 
 # JavaScript Benchmark on Browser
 
-### Editable and Forkable <a class="benchmark-run btn btn-success btn-sm" href="https://github.com/falsandtru/benchmark"> Repo on GitHub</a>
+### Editable and Forkable <a class="btn btn-success btn-sm" href="https://github.com/falsandtru/benchmark">Repo on GitHub</a>
 
 ```js
 function benchmark(Benchmark) {
