@@ -163,7 +163,20 @@ pre .line-numbers {
         })
         .run({ 'async': true });
     });
-  $('pre').attr('contenteditable', true);
+  $('pre')
+    .attr('contenteditable', true)
+    .on('paste', function (e) {
+      if (e.originalEvent && e.originalEvent.clipboardData && e.originalEvent.clipboardData.getData) {
+          e.preventDefault();
+          var text = e.originalEvent.clipboardData.getData('text/plain');
+          window.document.execCommand('insertHTML', false, text);
+      }
+      else if (e.clipboardData && e.clipboardData.getData) {
+          e.preventDefault();
+          var text = e.clipboardData.getData('text/plain');
+          window.document.execCommand('insertHTML', false, text);
+      }
+    });
   $('pre .line-numbers').remove();
 </script>
 
