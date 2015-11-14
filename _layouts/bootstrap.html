@@ -64,12 +64,6 @@ pre .line-numbers {
 
 {{ content }}
 
-<div style="text-align: center; margin-top: 5em; margin-bottom: 2em;">
-<button class="benchmark-run btn btn-primary btn-lg" style="width: 90%; height: 3em;">Bench</button>
-</div>
-
-<div id="benchmark-result" style="border: solid 1px lightgray; min-height: 100px; padding: 0 3% 1% 3%;"></div>
-
 </article>
 <aside></aside>
 </div>
@@ -107,6 +101,29 @@ pre .line-numbers {
 <script src="/benchmark/assets/js/benchmark.js"></script>
 
 <script>
+  $('pre')
+    .attr('contenteditable', true)
+    .on('paste', function (e) {
+      if (e.originalEvent && e.originalEvent.clipboardData && e.originalEvent.clipboardData.getData) {
+          e.preventDefault();
+          var text = e.originalEvent.clipboardData.getData('text/plain');
+          window.document.execCommand('insertHTML', false, text);
+      }
+      else if (e.clipboardData && e.clipboardData.getData) {
+          e.preventDefault();
+          var text = e.clipboardData.getData('text/plain');
+          window.document.execCommand('insertHTML', false, text);
+      }
+    })
+    .after([
+      '<div style="text-align: center; margin-top: 5em; margin-bottom: 2em;">',
+      '<button class="benchmark-run btn btn-primary btn-lg" style="width: 90%; height: 3em;">Bench</button>',
+      '</div>',
+      '<div class="benchmark-result" style="border: solid 1px lightgray; min-height: 100px; padding: 0 3% 1% 3%;"></div>'
+    ].join(''));
+  $('pre .line-numbers')
+    .remove();
+
   $('.benchmark-run')
     .on('click', function () {
       var code = $(this)
@@ -120,12 +137,15 @@ pre .line-numbers {
       catch (err) {
         alert('Benchmark suite loading is faild: ' + err);
       }
-      $('.benchmark-run').prop('disabled', true);
-      $('#benchmark-result')
+      $('.benchmark-run')
+        .blur()
+        .prop('disabled', true);
+      var $result = $(this).parent().next('.benchmark-result');
+      $result
         .prepend('<div style="border-bottom: solid 1px lightgray; padding: 0 2%;"/>');
       benchmark(Benchmark)
         .on('cycle', function (event) {
-          $('#benchmark-result div:first')
+          $result.find('div:first')
             .append($('<h4/>').text(event.target.name))
             .append($('<p/>').text(String(event.target).slice(event.target.name.length)));
         })
@@ -134,7 +154,7 @@ pre .line-numbers {
           var fastest = results.sort(function (a, b) {
             return b.hz - a.hz;
           })[0];
-          $('#benchmark-result div:first h4')
+          $result.find('div:first h4')
             .each(function (_, elem) {
               var name = $(elem).text();
               switch (name) {
@@ -159,25 +179,11 @@ pre .line-numbers {
                   break;
               }
             });
-            $('.benchmark-run').prop('disabled', false);
+            $('.benchmark-run')
+              .prop('disabled', false);
         })
         .run({ 'async': true });
     });
-  $('pre')
-    .attr('contenteditable', true)
-    .on('paste', function (e) {
-      if (e.originalEvent && e.originalEvent.clipboardData && e.originalEvent.clipboardData.getData) {
-          e.preventDefault();
-          var text = e.originalEvent.clipboardData.getData('text/plain');
-          window.document.execCommand('insertHTML', false, text);
-      }
-      else if (e.clipboardData && e.clipboardData.getData) {
-          e.preventDefault();
-          var text = e.clipboardData.getData('text/plain');
-          window.document.execCommand('insertHTML', false, text);
-      }
-    });
-  $('pre .line-numbers').remove();
 </script>
 
 <script>
