@@ -24,15 +24,14 @@ function benchmark(Benchmark) {
       }
     })
     .add('polyfill', function () {
-      clone(arr);
+      concat([], arr);
     });
 
-  function clone(arr) {
-    var arr2 = [];
-    for (var i = 0; i < arr.length; ++i) {
-      arr2[i] = arr[i];
+  function concat(target, source) {
+    for (var i = 0, offset = target.length, len = source.length; i < len; ++i) {
+      target[i + offset] = source[i];
     }
-    return arr2;
+    return target;
   }
 }
 ```
