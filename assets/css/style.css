@@ -230,6 +230,9 @@ a.btn,
 a.btn:visited{
   color: #fff;
 }
+pre .line-numbers {
+  display: none;
+}
 .overlay {
   display: none;
   overflow: auto;
