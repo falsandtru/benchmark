@@ -17,6 +17,15 @@ function benchmark(Benchmark) {
     .add('Array#concat', function () {
       arr.concat();
     })
+    .add('Array#push with spread operator', function () {
+      [].push(...arr);
+    })
+    .add('Array#push with apply', function () {
+      [].push.apply([], arr);
+    })
+    .add('Array#concat self', function () {
+      [].concat(arr);
+    })
     .add('for loop', function () {
       var arr2 = [];
       for (var i = 0; i < arr.length; i++) {
