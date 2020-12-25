@@ -33,12 +33,11 @@
 h1 {
   margin-bottom: 1em;
 }
-pre {
+textarea {
   background-color: #F9F9F9;
   margin-top: 2.0em;
-}
-pre:focus {
-  background-color: transparent;
+  width: 100%;
+  height: 0;
 }
 </style>
 </head>
@@ -96,40 +95,28 @@ pre:focus {
 
 <script>
   $('pre')
-    .attr('contenteditable', true)
-    .on('paste', function (e) {
-      if (e.originalEvent && e.originalEvent.clipboardData && e.originalEvent.clipboardData.getData) {
-          e.preventDefault();
-          var text = e.originalEvent.clipboardData.getData('text/plain');
-          window.document.execCommand('insertHTML', false, text);
-      }
-      else if (e.clipboardData && e.clipboardData.getData) {
-          e.preventDefault();
-          var text = e.clipboardData.getData('text/plain');
-          window.document.execCommand('insertHTML', false, text);
-      }
-    })
+    .replaceWith($('<textarea>').val($('pre').text()));
+  $('textarea')
+    .height($('textarea')[0].scrollHeight)
     .after([
       '<div style="text-align: center; margin-top: 5em; margin-bottom: 2em;">',
       '<button class="benchmark-run btn btn-primary btn-lg" style="width: 90%; height: 3em;">Bench</button>',
       '</div>',
       '<div class="benchmark-result" style="border: solid 1px lightgray; min-height: 100px; padding: 0 3% 1% 3%;"></div>'
     ].join(''));
-  $('pre .line-numbers')
-    .remove();
 
   $('.benchmark-run')
     .on('click', function () {
       var code = $(this)
         .parent()
         .prev()
-        .text();
+        .val();
       try {
         eval(code);
-        Benchmark;
+        benchmark;
       }
       catch (err) {
-        alert('Benchmark suite loading is faild: ' + err);
+        alert('Failed to load the benchmark suite: ' + err);
       }
       $('.benchmark-run')
         .blur()
